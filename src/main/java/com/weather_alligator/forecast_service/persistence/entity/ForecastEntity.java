@@ -1,4 +1,4 @@
-package com.weather_alligator.forecast_service.entity;
+package com.weather_alligator.forecast_service.persistence.entity;
 
 import com.weather_alligator.forecast_service.enums.Duration;
 import com.weather_alligator.forecast_service.enums.Source;
