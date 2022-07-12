@@ -1,4 +1,4 @@
-package com.weather_alligator.forecast_service.service;
+package com.weather_alligator.forecast_service.weatherApi;
 
 import com.weather_alligator.forecast_service.enums.Duration;
 import com.weather_alligator.forecast_service.enums.Source;
@@ -17,10 +17,10 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class WeatherBitService {
+public class WeatherBitApi {
     private final ForecastRepository repository;
 
-    public WeatherBitService(ForecastRepository repository) {
+    public WeatherBitApi(ForecastRepository repository) {
         this.repository = repository;
 
     }
@@ -28,21 +28,22 @@ public class WeatherBitService {
     @Value("${weatherBitKey}")
     private String weatherBitKey;
 
-    public void getForecast() {
+    public void getForecast(Float lat, Float lon, Long userId) {
         String url = "https://api.weatherbit.io/v2.0/current?lat={lat}&lon={lon}&lang={lang}&key={key}";
 
         RestTemplate restTemplate = new RestTemplate();
 
         Map<String, String> params = new HashMap<>();
         params.put("key", weatherBitKey);
-        params.put("lat", String.valueOf(53.23));
-        params.put("lon", String.valueOf(23.4));
+        params.put("lat", String.valueOf(lat));
+        params.put("lon", String.valueOf(lon));
         params.put("lang", "ru");
 
         String weather = restTemplate.exchange(url, HttpMethod.GET, null, String.class, params).getBody();
-        ForecastEntity entity = new ForecastEntity(2L, Source.WEATHER_BIT, Duration.CURRENT, Instant.now(), weather);
+
+        ForecastEntity entity = new ForecastEntity(userId, Source.WEATHER_BIT, Duration.CURRENT, Instant.now(), weather);
         repository.save(entity);
-
-
     }
+
+
 }

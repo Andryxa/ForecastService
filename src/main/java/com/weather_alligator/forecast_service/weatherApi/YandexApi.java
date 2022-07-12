@@ -1,4 +1,4 @@
-package com.weather_alligator.forecast_service.service;
+package com.weather_alligator.forecast_service.weatherApi;
 
 import com.weather_alligator.forecast_service.enums.*;
 import com.weather_alligator.forecast_service.persistence.entity.ForecastEntity;
@@ -14,17 +14,17 @@ import java.time.Instant;
 import java.util.HashMap;
 
 @Component
-public class YandexService {
+public class YandexApi {
     @Value("${yandexApiKey}")
     private String yandexKey;
     private final ForecastRepository repository;
 
 
-    public YandexService(ForecastRepository repository) {
+    public YandexApi(ForecastRepository repository) {
         this.repository = repository;
     }
 
-    public void getForecast() {
+    public void getForecast(Float lat, Float lon, Long userId) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://api.weather.yandex.ru/v1/fact?lat={lat}&lon={lon}&lang=ru_RU";
 
@@ -33,12 +33,12 @@ public class YandexService {
         var httpEntity = new HttpEntity<>(headers);
 
         var params = new HashMap<String, String>();
-        params.put("lat", String.valueOf(53.23));
-        params.put("lon", String.valueOf(23.4));
+        params.put("lat", String.valueOf(lat));
+        params.put("lon", String.valueOf(lon));
 
         String weather;
         weather = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class, params).getBody();
-        ForecastEntity entity = new ForecastEntity(2L, Source.YANDEX, Duration.CURRENT, Instant.now(), weather);
+        ForecastEntity entity = new ForecastEntity(userId, Source.YANDEX, Duration.CURRENT, Instant.now(), weather);
         repository.save(entity);
     }
 }

@@ -1,4 +1,4 @@
-package com.weather_alligator.forecast_service.service;
+package com.weather_alligator.forecast_service.weatherApi;
 
 
 import com.weather_alligator.forecast_service.enums.Duration;
@@ -15,25 +15,25 @@ import java.util.HashMap;
 
 
 @Component
-public class OpenWeatherService {
+public class OpenWeatherApi {
     @Value("${openWeatherKey}")
     private String openWeatherKey;
     private final ForecastRepository repository;
 
-    public OpenWeatherService(ForecastRepository repository) {
+    public OpenWeatherApi(ForecastRepository repository) {
         this.repository = repository;
     }
 
-    public void getForecast() {
+    public void getForecast(Float lat, Float lon, Long userId) {
         String url = "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=metric&lang=ru&appid={appid}";
         RestTemplate restTemplate = new RestTemplate();
         var params = new HashMap<String, String>();
-        params.put("lat", String.valueOf(53.23));
-        params.put("lon", String.valueOf(23.4));
+        params.put("lat", String.valueOf(lat));
+        params.put("lon", String.valueOf(lon));
         params.put("appid", openWeatherKey);
         String weather;
         weather = restTemplate.exchange(url, HttpMethod.GET, null, String.class, params).getBody();
-        ForecastEntity entity = new ForecastEntity(2L, Source.OPEN_WEATHER, Duration.CURRENT, Instant.now(), weather);
+        ForecastEntity entity = new ForecastEntity(userId, Source.OPEN_WEATHER, Duration.CURRENT, Instant.now(), weather);
         repository.save(entity);
     }
 }
